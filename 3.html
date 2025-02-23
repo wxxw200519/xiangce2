@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦幻生日旋转相册</title>
+    <!-- 引入 Google Fonts 艺术字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@700&family=Lobster&display=swap" rel="stylesheet">
+    <style>
+        /* 星空背景 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* 星空动画 */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+        }
+
+        .stars::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(2px 2px at 20% 30%, white 1%, transparent 100%),
+                        radial-gradient(2px 2px at 80% 70%, white 1%, transparent 100%),
+                        radial-gradient(2px 2px at 50% 90%, white 1%, transparent 100%);
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        .stars::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(2px 2px at 10% 20%, white 1%, transparent 100%),
+                        radial-gradient(2px 2px at 90% 80%, white 1%, transparent 100%),
+                        radial-gradient(2px 2px at 70% 10%, white 1%, transparent 100%);
+            animation: twinkle 5s infinite ease-in-out;
+        }
+
+        /* 立方体容器 */
+        .cube-container {
+            position: relative;
+            width: 150px; /* 缩小立方体尺寸 */
+            height: 150px; /* 缩小立方体尺寸 */
+            transform-style: preserve-3d;
+            transform: rotateX(-15deg) rotateY(0deg); /* 初始倾斜 */
+            animation: rotate 12s linear infinite; /* 旋转速度调整为 12 秒 */
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .cube, .outer-cube {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .cube div, .outer-cube div {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        /* 内部立方体样式 */
+        .cube {
+            width: 90px; /* 缩小内部立方体尺寸 */
+            height: 90px; /* 缩小内部立方体尺寸 */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cube div {
+            border: 2px solid rgba(255, 105, 180, 0.8);
+            box-shadow: 
+                0 0 10px rgba(255, 105, 180, 0.8),
+                inset 0 0 10px rgba(255, 105, 180, 0.8);
+        }
+
+        /* 外部水晶立方体样式 */
+        .outer-cube div {
+            background: rgba(173, 216, 230, 0.1);
+            border: 1px solid rgba(173, 216, 230, 0.3);
+            box-shadow: 
+                0 0 30px rgba(173, 216, 230, 0.8),
+                inset 0 0 15px rgba(173, 216, 230, 0.4);
+            filter: brightness(1.2) contrast(1.2);
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* 水晶立方体倒影 */
+        .outer-cube .front::before, 
+        .outer-cube .back::before, 
+        .outer-cube .right::before, 
+        .outer-cube .left::before, 
+        .outer-cube .top::before, 
+        .outer-cube .bottom::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6;
+            -webkit-mask: radial-gradient(circle at 30% 50%, black 40%, transparent 60%);
+            mask: radial-gradient(circle at 30% 50%, black 40%, transparent 60%);
+        }
+
+        .outer-cube .front::before  { background-image: url('images/1.jpeg'); }
+        .outer-cube .back::before   { background-image: url('images/2.jpeg'); }
+        .outer-cube .right::before  { background-image: url('images/3.jpeg'); }
+        .outer-cube .left::before   { background-image: url('images/4.jpeg'); }
+        .outer-cube .top::before    { background-image: url('images/5.jpg'); }
+        .outer-cube .bottom::before { background-image: url('images/6.jpg'); }
+
+        /* 内部立方体各面初始位置 */
+        .cube .front  { transform: translateZ(45px); } /* 调整 Z 轴距离 */
+        .cube .back   { transform: rotateY(180deg) translateZ(45px); } /* 调整 Z 轴距离 */
+        .cube .right  { transform: rotateY(90deg) translateZ(45px); } /* 调整 Z 轴距离 */
+        .cube .left   { transform: rotateY(-90deg) translateZ(45px); } /* 调整 Z 轴距离 */
+        .cube .top    { transform: rotateX(90deg) translateZ(45px); } /* 调整 Z 轴距离 */
+        .cube .bottom { transform: rotateX(-90deg) translateZ(45px); } /* 调整 Z 轴距离 */
+
+        /* 外部水晶立方体各面初始位置 */
+        .outer-cube .front  { transform: translateZ(75px); } /* 调整 Z 轴距离 */
+        .outer-cube .back   { transform: rotateY(180deg) translateZ(75px); } /* 调整 Z 轴距离 */
+        .outer-cube .right  { transform: rotateY(90deg) translateZ(75px); } /* 调整 Z 轴距离 */
+        .outer-cube .left   { transform: rotateY(-90deg) translateZ(75px); } /* 调整 Z 轴距离 */
+        .outer-cube .top    { transform: rotateX(90deg) translateZ(75px); } /* 调整 Z 轴距离 */
+        .outer-cube .bottom { transform: rotateX(-90deg) translateZ(75px); } /* 调整 Z 轴距离 */
+
+        /* 克隆元素样式 */
+        .clone {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: 100% 100%;
+            background-position: center;
+            border: 2px solid rgba(255, 105, 180, 0.8);
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0;
+            pointer-events: none;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        /* 修改：仅绕 Y 轴旋转 */
+        @keyframes rotate {
+            0% { transform: rotateX(-15deg) rotateY(0); }
+            100% { transform: rotateX(-15deg) rotateY(360deg); }
+        }
+
+        /* 新增：流光溢彩背景 */
+        .aurora-borealis {
+            position: fixed;
+            width: 200vw;
+            height: 200vh;
+            background: linear-gradient(
+                45deg,
+                rgba(255,105,180,0.1),
+                rgba(173,216,230,0.1),
+                rgba(147,112,219,0.1)
+            );
+            filter: blur(80px);
+            animation: aurora 20s infinite linear;
+            z-index: -2;
+        }
+
+        @keyframes aurora {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* 新增：粒子特效 */
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
+            animation: particle-float 3s infinite ease-in-out;
+        }
+
+        @keyframes particle-float {
+            0%, 100% { transform: translateY(0); opacity: 0; }
+            50% { transform: translateY(-20px); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 新增特效元素 -->
+    <div class="aurora-borealis"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- 原有结构保留 -->
+    <div class="stars"></div>
+    <div class="cube-container">
+        <!-- 内部立方体 -->
+        <div class="cube">
+            <div class="front" style="background-image: url('images/1.jpeg')"></div>
+            <div class="back" style="background-image: url('images/2.jpeg')"></div>
+            <div class="right" style="background-image: url('images/3.jpeg')"></div>
+            <div class="left" style="background-image: url('images/4.jpeg')"></div>
+            <div class="top" style="background-image: url('images/5.jpg')"></div>
+            <div class="bottom" style="background-image: url('images/6.jpg')"></div>
+        </div>
+        <!-- 外部水晶立方体 -->
+        <div class="outer-cube">
+            <div class="front"></div>
+            <div class="back"></div>
+            <div class="right"></div>
+            <div class="left"></div>
+            <div class="top"></div>
+            <div class="bottom"></div>
+        </div>
+    </div>
+
+    <script>
+        // 原有脚本保留
+        const cubeContainer = document.querySelector('.cube-container');
+        const outerCube = document.querySelector('.outer-cube');
+        const MOVE_DISTANCE = 90; /* 调整移动距离 */
+        const SCALE_FACTOR = 1.2;
+        let isExpanded = false;
+        let clones = [];
+
+        cubeContainer.addEventListener('click', toggleEffect);
+
+        function toggleEffect() {
+            if (isExpanded) {
+                clones.forEach(clone => {
+                    clone.style.transition = 'all 0.5s ease-in';
+                    clone.style.transform = clone.dataset.originalTransform;
+                    clone.style.opacity = '0';
+                    clone.addEventListener('transitionend', () => clone.remove(), { once: true });
+                });
+                clones = [];
+                outerCube.style.opacity = '1';
+            } else {
+                outerCube.style.opacity = '0';
+                document.querySelectorAll('.cube > div').forEach(face => {
+                    const clone = face.cloneNode(true);
+                    const originalTransform = getComputedStyle(face).transform;
+                    clone.className = 'clone';
+                    clone.style.transform = originalTransform;
+                    clone.style.opacity = '0';
+                    clone.dataset.originalTransform = originalTransform;
+                    cubeContainer.appendChild(clone);
+                    requestAnimationFrame(() => {
+                        clone.style.transform = `${originalTransform} 
+                            translateZ(${MOVE_DISTANCE}px) 
+                            scale(${SCALE_FACTOR})`;
+                        clone.style.opacity = '0.9';
+                    });
+                    clones.push(clone);
+                });
+            }
+            isExpanded = !isExpanded;
+        }
+
+        // 新增：粒子特效
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 100;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 3}s`;
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
